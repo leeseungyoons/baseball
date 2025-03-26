@@ -12,7 +12,7 @@ import matplotlib.font_manager as fm
 sa = SentimentAnalyzer()
 ke = KeywordExtractor()
 
-st.title("⚾ 야구 뉴스 감정 분석 & 키워드 추출기")
+st.title("뉴스 감정 분석 & 키워드 추출기")
 
 uploaded_file = st.file_uploader("📰 뉴스 텍스트 파일 업로드 (.txt)", type="txt")
 
