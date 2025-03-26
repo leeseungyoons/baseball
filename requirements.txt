@@ -4,5 +4,3 @@ torch
 matplotlib
 seaborn
 wordcloud
-konlpy
-eunjeon
