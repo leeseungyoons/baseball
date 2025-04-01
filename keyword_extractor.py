@@ -1,14 +1,24 @@
-# keyword_extractor.py (Streamlit Cloud용 경량 버전)
-from collections import Counter
-import re
+from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
 class KeywordExtractor:
     def __init__(self):
-        self.stopwords = set(["경기", "선수", "오늘", "어제", "이번", "상대", "팬", "이닝", "결과", "기록"])
+        # NER 모델 불러오기
+        self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
+        self.model = AutoModelForTokenClassification.from_pretrained("klue/bert-base")
+        self.nlp_ner = pipeline("ner", model=self.model, tokenizer=self.tokenizer)
 
-    def extract(self, text, top_k=5):
-        # 2글자 이상 한글 단어만 추출
-        words = re.findall(r'\b[가-힣]{2,}\b', text)
-        words = [w for w in words if w not in self.stopwords]
-        count = Counter(words)
-        return count.most_common(top_k)
+    def extract(self, text):
+        # NER을 통한 개체명 추출
+        ner_results = self.nlp_ner(text)
+        
+        entities = {"PER": [], "ORG": [], "RECORD": []}
+
+        for entity in ner_results:
+            if entity["entity"] == "B-PER":
+                entities["PER"].append(entity["word"])  # 선수명
+            elif entity["entity"] == "B-ORG":
+                entities["ORG"].append(entity["word"])  # 팀명
+            elif "기록" in entity["word"]:  # 예시: 기록 포함 키워드
+                entities["RECORD"].append(entity["word"])
+
+        return entities
