@@ -64,7 +64,7 @@ st.pyplot(fig)
 
 
     # ✅ 워드클라우드
-    st.subheader("☁️ 전체 키워드 워드클라우드")
+st.subheader("☁️ 전체 키워드 워드클라우드")
     wc = WordCloud(font_path=font_path, background_color="white", width=800, height=400)
     wc.generate_from_frequencies(all_keywords)
     fig2, ax2 = plt.subplots(figsize=(10, 5))
