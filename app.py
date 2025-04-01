@@ -27,12 +27,12 @@ if uploaded_file is not None:
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
-label, prob = sa.predict(article)
+    label, prob = sa.predict(article)
 
-label_map = {"Positive": "긍정", "Negative": "부정"}
-translated_label = label_map.get(label, label)
+    label_map = {"Positive": "긍정", "Negative": "부정"}
+    translated_label = label_map.get(label, label)
 
-st.write(f"**감정 분석 결과:** {translated_label} (신뢰도: {prob:.2f})")
+    st.write(f"**감정 분석 결과:** {translated_label} (신뢰도: {prob:.2f})")
 
         sentiment_counts[label] += 1
 
