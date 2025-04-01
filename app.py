@@ -44,7 +44,7 @@ st.subheader("📊 감정 분석 요약")
 
 labels = list(sentiment_counts.keys())  # 예: ["긍정", "부정"]
 values = list(sentiment_counts.values())
-colors = ["#4da6ff" if l == "긍정" else "#ff6666" for l in labels]
+colors = ["#4da6ff" if l == "good" else "#ff6666" for l in labels]
 
 sns.set_style("whitegrid")
 fig, ax = plt.subplots(figsize=(6, 4))
