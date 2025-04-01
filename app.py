@@ -37,17 +37,17 @@ if uploaded_file is not None:
         label, prob = sa.predict(article)
         translated_label = label_map.get(label, label)
 
-        # ✅ 긍정 보정
-        if label == "Negative" and any(word in article for word in positive_words):
-            label = "Positive"
-            translated_label = "긍정"
-            st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
-
-        # ✅ 부정 보정
-        elif label == "Positive" and any(word in article for word in negative_words):
+        # ✅ 1. 부정 보정 우선
+        if label == "Positive" and any(word in article for word in negative_words):
             label = "Negative"
             translated_label = "부정"
             st.caption("⚠️ 부정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
+
+        # ✅ 2. 긍정 보정은 그다음
+        elif label == "Negative" and any(word in article for word in positive_words):
+            label = "Positive"
+            translated_label = "긍정"
+            st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
         st.write(f"**감정 분석 결과:** {translated_label} (신뢰도: {prob:.2f})")
         st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
