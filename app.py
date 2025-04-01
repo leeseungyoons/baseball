@@ -33,7 +33,7 @@ if uploaded_file is not None:
         label, prob = sa.predict(article)
         translated_label = label_map.get(label, label)
 
-        st.write(f"**감정 분석 결과:** {translated_label} (신뢰도: {prob:.2f})")
+        st.write(f"**감정 분석 결과:** {translated_label} (신뢰도: {prob:.4f})")
 
         sentiment_counts[translated_label] += 1
 
@@ -59,7 +59,7 @@ if uploaded_file is not None:
     for bar in bars:
         height = bar.get_height()
         ax.text(bar.get_x() + bar.get_width() / 2, height + 0.1, f"{int(height)}",
-                ha='center', va='bottom', fontsize=12, fontweight='bold')
+                ha='center', va='bottom', fontsize=12, fontweight='bold', fontproperties=font_prop)
 
     ax.set_ylim(0, max(values) + 1)
     ax.set_ylabel("문서 수", fontsize=11, fontproperties=font_prop)
