@@ -8,7 +8,7 @@ import seaborn as sns
 from collections import Counter
 from wordcloud import WordCloud
 
-#모델 인스턴스
+# 모델 인스턴스
 sa = SentimentAnalyzer()
 ke = KeywordExtractor()
 
@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'(?:\n\s*){5,}', text.strip())
+    articles = re.split(r'(?:\n\s*){5,}', text.strip())  # 5줄 이상 빈 줄 기준 분리
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
@@ -26,7 +26,7 @@ if uploaded_file is not None:
     st.subheader("📄 기사 분석 결과")
     label_map = {"Positive": "긍정", "Negative": "부정"}
 
-    #키워드 리스트
+    # 키워드 리스트
     positive_words = ["승리", "대승", "완승", "홈런", "안타", "우승", "역전", "세이브", "멀티히트", "3안타", "2안타", "3연승"]
     negative_words = ["패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패"]
 
@@ -34,22 +34,22 @@ if uploaded_file is not None:
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
-        #감정 예측
+        # 감정 예측
         orig_label, prob = sa.predict(article)
         label = orig_label
         translated_label = label_map.get(label, label)
 
-        #키워드 포함 여부 확인
+        # 키워드 포함 여부 확인
         has_positive = any(word in article for word in positive_words)
         has_negative = any(word in article for word in negative_words)
 
-        #🔥부정 키워드가 포함돼 있으면 무조건 부정
+        # 부정 키워드 우선 보정
         if has_negative:
             label = "Negative"
             translated_label = "부정"
             st.caption("⚠️ 부정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
-        #✅부정은 없고 긍정만 있을 때만 긍정 보정
+        # 부정은 없고 긍정만 있을 때만 긍정 보정
         elif orig_label == "Negative" and has_positive:
             label = "Positive"
             translated_label = "긍정"
@@ -63,10 +63,12 @@ if uploaded_file is not None:
         keywords = ke.extract(article)
         all_keywords.update(dict(keywords))
         st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
-        st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
+        st.markdown("---")
 
+    # ✅ 안내 문구는 루프 밖에!
+    st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 꼭 넣어주세요!")
 
-    #✅한글 폰트 설정
+    # ✅ 한글 폰트 설정
     font_path = "NanumGothic.ttf"
     font_prop = fm.FontProperties(fname=font_path)
 
@@ -93,7 +95,7 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    #☁️워드클라우드
+    # ☁️ 워드클라우드
     st.subheader("☁️ 키워드 워드 클라우드")
 
     if all_keywords:
