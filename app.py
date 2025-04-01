@@ -63,7 +63,8 @@ if uploaded_file is not None:
         keywords = ke.extract(article)
         all_keywords.update(dict(keywords))
         st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
-        st.markdown("여러 기사를 넣으려면 기사 사이에 빈 줄 5칸 이상을(Enter 5번)을 꼭 넣어주세요. /n 기사 사이에만 5번 이상이면 그 이상을 누르셔도 됩니다 :) ")
+        st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
+
 
     #✅한글 폰트 설정
     font_path = "NanumGothic.ttf"
