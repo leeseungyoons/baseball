@@ -2,24 +2,18 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification, pipelin
 
 class KeywordExtractor:
     def __init__(self):
-        # NER 모델 불러오기
-        self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base-ner")
-        self.model = AutoModelForTokenClassification.from_pretrained("klue/bert-base-ner")
-
+        self.tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
+        self.model = AutoModelForTokenClassification.from_pretrained("dslim/bert-base-NER")
         self.nlp_ner = pipeline("ner", model=self.model, tokenizer=self.tokenizer)
 
     def extract(self, text):
-        # NER을 통한 개체명 추출
         ner_results = self.nlp_ner(text)
-        
         entities = {"PER": [], "ORG": [], "RECORD": []}
-
         for entity in ner_results:
-            if entity["entity"] == "B-PER":
-                entities["PER"].append(entity["word"])  # 선수명
-            elif entity["entity"] == "B-ORG":
-                entities["ORG"].append(entity["word"])  # 팀명
-            elif "기록" in entity["word"]:  # 예시: 기록 포함 키워드
+            if "PER" in entity["entity"]:
+                entities["PER"].append(entity["word"])
+            elif "ORG" in entity["entity"]:
+                entities["ORG"].append(entity["word"])
+            elif "안타" in entity["word"] or "홈런" in entity["word"]:
                 entities["RECORD"].append(entity["word"])
-
         return entities
