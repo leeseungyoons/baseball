@@ -3,8 +3,9 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification, pipelin
 class KeywordExtractor:
     def __init__(self):
         # NER 모델 불러오기
-        self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
-        self.model = AutoModelForTokenClassification.from_pretrained("klue/bert-base")
+        self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base-ner")
+        self.model = AutoModelForTokenClassification.from_pretrained("klue/bert-base-ner")
+
         self.nlp_ner = pipeline("ner", model=self.model, tokenizer=self.tokenizer)
 
     def extract(self, text):
