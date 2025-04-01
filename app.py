@@ -38,33 +38,30 @@ if uploaded_file is not None:
         st.markdown("---")
 
     # ✅ 감정 분석 요약 그래프
-    st.subheader("📊 감정 분석 요약")
+# 감정 분석 요약
+st.subheader("📊 Sentiment Summary")
 
-    # 💡 폰트 설정: 프로젝트 폴더에 있는 NanumGothic.ttf 사용
-    font_path = "NanumGothic.ttf"
-    font_name = fm.FontProperties(fname=font_path).get_name()
-    plt.rc('font', family=font_name)
+fig, ax = plt.subplots(figsize=(6, 4))
 
-    sns.set_style("whitegrid")
-    fig, ax = plt.subplots(figsize=(6, 4))
+labels = list(sentiment_counts.keys())  # Positive, Negative
+values = list(sentiment_counts.values())
+colors = ["#4da6ff" if l == "Positive" else "#ff6666" for l in labels]
 
-    labels = list(sentiment_counts.keys())
-    values = list(sentiment_counts.values())
-    colors = ["#4da6ff" if l == "긍정" else "#ff6666" for l in labels]
+bars = ax.bar(labels, values, color=colors)
 
-    bars = ax.bar(labels, values, color=colors)
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2, height + 0.1, f"{int(height)}",
+            ha='center', va='bottom', fontsize=12, fontweight='bold')
 
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2, height + 0.1, f"{int(height)}",
-                ha='center', va='bottom', fontsize=12, fontweight='bold')
+# ✅ 영어로 모두 바꾼 축/제목
+ax.set_ylim(0, max(values) + 1)
+ax.set_ylabel("Count", fontsize=11)
+ax.set_xlabel("Sentiment", fontsize=11)
+ax.set_title("Sentiment Analysis Result", fontsize=14, weight='bold')
 
-    ax.set_ylim(0, max(values) + 1)
-    ax.set_ylabel("문서 수", fontsize=11)
-    ax.set_xlabel("감정 분류", fontsize=11)
-    ax.set_title("감정 분석 결과 분포", fontsize=14, weight='bold')
+st.pyplot(fig)
 
-    st.pyplot(fig)
 
     # ✅ 워드클라우드
     st.subheader("☁️ 전체 키워드 워드클라우드")
