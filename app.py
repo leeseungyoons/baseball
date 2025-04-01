@@ -19,7 +19,7 @@ if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
     articles = text.strip().split("\n\n")  # 문단 기준 나누기
 
-    sentiment_counts = Counter()
+    sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
 
     st.subheader("📄 기사 분석 결과")
@@ -48,8 +48,8 @@ if uploaded_file is not None:
 
     st.subheader("📊 감정 분석 요약")
 
-    labels = list(sentiment_counts.keys())
-    values = list(sentiment_counts.values())
+    labels = ["긍정", "부정"]
+    values = [sentiment_counts["긍정"], sentiment_counts["부정"]]
     colors = ["#4da6ff" if l == "긍정" else "#ff6666" for l in labels]
 
     sns.set_style("whitegrid")
