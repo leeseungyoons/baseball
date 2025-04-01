@@ -66,7 +66,7 @@ if uploaded_file is not None:
     ax.set_ylim(0, max(values) + 1)
     ax.set_ylabel("문서 수", fontsize=11, fontproperties=font_prop)
     ax.set_xlabel("감정 분류", fontsize=11, fontproperties=font_prop)
-    ax.set_title("감정 분석 결과 분포", fontsize=14, fontweight='bold')
+    ax.set_title("감정 분석 결과 분포", fontsize=14, fontweight='bold', fontproperties=font_prop)
 
     st.pyplot(fig)
 
