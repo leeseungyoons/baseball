@@ -51,8 +51,10 @@ if uploaded_file is not None:
             translated_label = "긍정"
             st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
+        # 감정 분석 결과
         st.write(f"**감정 분석 결과:** {translated_label}")
-        st.progress(pos_score, text=f"긍정: {pos_score:.2f} / 부정: {neg_score:.2f}")
+        st.write(f"긍정: {pos_score:.2f} / 부정: {neg_score:.2f}")
+        st.progress(pos_score)
         st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
 
         sentiment_counts[translated_label] += 1
