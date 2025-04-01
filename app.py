@@ -34,6 +34,14 @@ if uploaded_file is not None:
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
+        st.write("🧪 감정 분석 디버그 중")
+        try:
+            label, pos_score, neg_score = sa.predict(article)
+            st.write(f"[DEBUG] label: {label}, pos: {pos_score}, neg: {neg_score}")
+        except Exception as e:
+            st.error(f"감정 분석 오류 발생: {e}")
+            continue  # 이 기사 생략하고 다음 걸로 넘어가
+
         # 감정 분석
         label, pos_score, neg_score = sa.predict(article)
         translated_label = label_map.get(label, label)
@@ -68,6 +76,8 @@ if uploaded_file is not None:
             st.markdown(f"- 팀: {', '.join(set(entities['ORG']))}")
         if entities["RECORD"]:
             st.markdown(f"- 기록: {', '.join(set(entities['RECORD']))}")
+    except Exception as e:
+        st.error(f"개체명 추출 오류 발생: {e}")
 
         # 키워드 누적 저장 (선수명 + 팀명 기반)
         keywords = dict(Counter(entities["PER"] + entities["ORG"]))
