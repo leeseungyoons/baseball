@@ -1,3 +1,4 @@
+# sentiment_model.py 내부
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn.functional as F
@@ -16,5 +17,6 @@ class SentimentAnalyzer:
             positive_score = probs[1].item()
             negative_score = probs[0].item()
 
+        # ✅ 잘못된 경우가 많아서 여기서 직접 비교
         label = "Positive" if positive_score > negative_score else "Negative"
         return label, positive_score, negative_score
