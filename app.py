@@ -1,4 +1,5 @@
 import streamlit as st
+import re
 from sentiment_model import SentimentAnalyzer
 from keyword_extractor import KeywordExtractor
 import matplotlib.pyplot as plt
@@ -17,7 +18,8 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = text.strip().split("\n\n")  # 문단 기준 나누기
+    
+    articles = re.split(r'\n\s*\n', text.strip())  # 문단 기준 나누기
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
