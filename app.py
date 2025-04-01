@@ -77,7 +77,7 @@ if uploaded_file is not None:
         # 키워드 추출
         keywords = ke.extract(article)
         all_keywords.update(dict(keywords))
-        st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
+        st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords.items()]))
 
         st.markdown("---")
 
