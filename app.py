@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 from wordcloud import WordCloud
+import matplotlib.font_manager as fm
 
 # 모델 및 키워드 추출기 인스턴스
 sa = SentimentAnalyzer()
@@ -35,34 +36,37 @@ if uploaded_file is not None:
         st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
         st.markdown("---")
 
-    # 📊 Sentiment Summary Graph
-    st.subheader("📊 Sentiment Summary")
+font_path = "NanumGothic.ttf"
+font_name = fm.FontProperties(fname=font_path).get_name()
+plt.rc("font", family=font_name)
 
-    labels = list(sentiment_counts.keys())  # ["Positive", "Negative"]
-    values = list(sentiment_counts.values())
-    colors = ["#4da6ff" if l == "Positive" else "#ff6666" for l in labels]
+st.subheader("📊 감정 분석 요약")
 
-    sns.set_style("whitegrid")
-    fig, ax = plt.subplots(figsize=(6, 4))
-    bars = ax.bar(labels, values, color=colors)
+labels = list(sentiment_counts.keys())  # 예: ["긍정", "부정"]
+values = list(sentiment_counts.values())
+colors = ["#4da6ff" if l == "긍정" else "#ff6666" for l in labels]
 
-    for bar in bars:
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, height + 0.1, f"{int(height)}",
-                ha='center', va='bottom', fontsize=12, fontweight='bold')
+sns.set_style("whitegrid")
+fig, ax = plt.subplots(figsize=(6, 4))
+bars = ax.bar(labels, values, color=colors)
 
-    ax.set_ylim(0, max(values) + 1)
-    ax.set_ylabel("Count", fontsize=11)
-    ax.set_xlabel("Sentiment", fontsize=11)
-    ax.set_title("Sentiment Analysis Result", fontsize=14, weight='bold')
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width() / 2, height + 0.1, f"{int(height)}",
+            ha='center', va='bottom', fontsize=12, fontweight='bold')
 
-    st.pyplot(fig)
+ax.set_ylim(0, max(values) + 1)
+ax.set_ylabel("문서 수", fontsize=11)
+ax.set_xlabel("감정 분류", fontsize=11)
+ax.set_title("감정 분석 결과 분포", fontsize=14, weight='bold')
+
+st.pyplot(fig)
 
 # ☁️ Keyword WordCloud
-st.subheader("☁️ Keyword WordCloud")
+st.subheader("☁️키워드 워드 클라우드")
 
 wc = WordCloud(
-    font_path="NanumGothic.ttf",  # 🔥 이 줄이 핵심
+    font_path="NanumGothic.ttf",  
     background_color="white",
     width=800,
     height=400
