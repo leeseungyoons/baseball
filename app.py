@@ -11,9 +11,9 @@ import matplotlib.font_manager as fm
 sa = SentimentAnalyzer()
 ke = KeywordExtractor()
 
-st.title("⚾ Baseball News Sentiment Analyzer")
+st.title("⚾ 스포츠 기사 분석 시스템")
 
-uploaded_file = st.file_uploader("📰 Upload news text file (.txt)", type="txt")
+uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣어주세요. (.txt)", type="txt")
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
@@ -37,18 +37,18 @@ if uploaded_file is not None:
         st.markdown("---")
 
 font_path = "NanumGothic.ttf"
-font_name = fm.FontProperties(fname=font_path).get_name()
+font_prop = fm.FontProperties(fname=font_path)
 plt.rc("font", family=font_name)
 
 st.subheader("📊 감정 분석 요약")
 
 labels = list(sentiment_counts.keys())  # 예: ["긍정", "부정"]
 values = list(sentiment_counts.values())
-colors = ["#4da6ff" if l == "good" else "#ff6666" for l in labels]
+colors = ["#4da6ff" if l == "긍정" else "#ff6666" for l in labels]
 
 sns.set_style("whitegrid")
 fig, ax = plt.subplots(figsize=(6, 4))
-bars = ax.bar(labels, values, color=colors)
+bars = ax.bar(["긍정", "부정"], [5, 3], color=["#4da6ff", "#ff6666"])
 
 for bar in bars:
     height = bar.get_height()
@@ -56,9 +56,9 @@ for bar in bars:
             ha='center', va='bottom', fontsize=12, fontweight='bold')
 
 ax.set_ylim(0, max(values) + 1)
-ax.set_ylabel("문서 수", fontsize=11)
-ax.set_xlabel("감정 분류", fontsize=11)
-ax.set_title("감정 분석 결과 분포", fontsize=14, weight='bold')
+ax.set_ylabel("문서 수", fontsize=11, fontproperties=font_prop)
+ax.set_xlabel("감정 분류", fontsize=11, fontproperties=font_prop)
+ax.set_title("감정 분석 결과 분포", fontsize=14, fontweight='bold', fontproperties=font_prop)
 
 st.pyplot(fig)
 
