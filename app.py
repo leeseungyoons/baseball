@@ -34,35 +34,28 @@ if uploaded_file is not None:
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
-        # 감정 분석 디버깅
-        st.write("🧪 감정 분석 디버그 중")
         try:
             label, pos_score, neg_score = sa.predict(article)
-            st.write(f"[DEBUG] label: {label}, pos: {pos_score}, neg: {neg_score}")
         except Exception as e:
             st.error(f"감정 분석 오류 발생: {e}")
-            continue  # 이 기사 생략하고 다음 걸로 넘어감
+            continue
 
         translated_label = label_map.get(label, label)
-
-        # 감정 보정 로직
-        has_positive = any(word in article for word in positive_words)
-        has_negative = any(word in article for word in negative_words)
-
-        if has_negative:
-            label = "Negative"
-            translated_label = "부정"
-            st.caption("⚠️ 부정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
-        elif label == "Negative" and has_positive:
-            label = "Positive"
-            translated_label = "긍정"
-            st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
         # 감정 결과 출력
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.4f} / 부정: {neg_score:.4f}")
         st.progress(pos_score)
         st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
+
+        # 보정 메시지만 표시 (label은 그대로 유지)
+        has_positive = any(word in article for word in positive_words)
+        has_negative = any(word in article for word in negative_words)
+
+        if has_negative:
+            st.caption("⚠️ 부정 키워드 포함 → 의미상 부정 가능성 있음")
+        elif label == "Negative" and has_positive:
+            st.caption("✅ 긍정 키워드 포함 → 의미상 긍정일 수 있음")
 
         sentiment_counts[translated_label] += 1
 
