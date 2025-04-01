@@ -26,7 +26,7 @@ if uploaded_file is not None:
     st.subheader("📄 기사 분석 결과")
     label_map = {"Positive": "긍정", "Negative": "부정"}
 
-    # ✅ 스포츠 긍정/부정 키워드
+    # ✅ 스포츠 키워드 세트
     positive_words = [
         "승리", "완승", "대승", "압승", "이겼다", "이기며", "역전승", "끝내기",
         "우승", "연승", "홈런", "멀티히트", "3안타", "4안타", "쾌조", "호투",
@@ -58,13 +58,12 @@ if uploaded_file is not None:
 
         translated_label = label_map.get(label, label)
 
-        # 결과 출력
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.4f} / 부정: {neg_score:.4f}")
         st.progress(pos_score)
         st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
 
-        # 스포츠 키워드 기반 보정 메시지 (label 자체는 변경하지 않음)
+        # 보정 메시지
         has_positive = any(word in article for word in positive_words)
         has_negative = any(word in article for word in negative_words)
 
@@ -75,26 +74,19 @@ if uploaded_file is not None:
 
         sentiment_counts[translated_label] += 1
 
-        # 개체명 인식 (없을 경우도 '없음'으로 표시)
+        # 키워드 추출 (단어 기반)
         try:
-            entities = ke.extract(article)
-            st.write("📎 **개체명 추출 결과:**")
-            st.markdown(f"- 선수: {', '.join(set(entities['PER'])) if entities['PER'] else '없음'}")
-            st.markdown(f"- 팀: {', '.join(set(entities['ORG'])) if entities['ORG'] else '없음'}")
-            st.markdown(f"- 기록: {', '.join(set(entities['RECORD'])) if entities['RECORD'] else '없음'}")
-
-            # 키워드 누적 저장 (선수명 + 팀명 기반)
-            keywords = dict(Counter(entities["PER"] + entities["ORG"]))
-            all_keywords.update(keywords)
-
+            keywords = ke.extract(article)
+            all_keywords.update(dict(keywords))
+            st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
         except Exception as e:
-            st.error(f"개체명 추출 오류 발생: {e}")
+            st.error(f"키워드 추출 오류 발생: {e}")
 
         st.markdown("---")
 
     st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
 
-    # ✅ 한글 폰트 설정
+    # 폰트 설정
     font_path = "NanumGothic.ttf"
     font_prop = fm.FontProperties(fname=font_path)
 
@@ -121,7 +113,7 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    # ☁️ 워드클라우드
+    # 워드클라우드
     st.subheader("☁️ 키워드 워드 클라우드")
     if all_keywords:
         wc = WordCloud(
