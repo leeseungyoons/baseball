@@ -2,10 +2,11 @@ import streamlit as st
 from sentiment_model import SentimentAnalyzer
 from keyword_extractor import KeywordExtractor
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 import seaborn as sns
 from collections import Counter
 from wordcloud import WordCloud
-import matplotlib.font_manager as fm
+
 
 # 모델 및 키워드 추출기 인스턴스
 sa = SentimentAnalyzer()
@@ -38,7 +39,6 @@ if uploaded_file is not None:
 
 font_path = "NanumGothic.ttf"
 font_prop = fm.FontProperties(fname=font_path)
-plt.rc("font", family=font_name)
 
 st.subheader("📊 감정 분석 요약")
 
