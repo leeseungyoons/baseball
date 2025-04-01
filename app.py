@@ -12,9 +12,9 @@ from wordcloud import WordCloud
 sa = SentimentAnalyzer()
 ke = KeywordExtractor()
 
-st.title("⚾ 스포츠 기사 분석 시스템")
+st.title("⚾ 스포츠 기사 감정 분석기")
 
-uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣어주세요. (.txt)", type="txt")
+uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣어주세요 (.txt)", type="txt")
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
@@ -22,68 +22,73 @@ if uploaded_file is not None:
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
-
-    st.subheader("📄 기사 분석 결과")
     label_map = {"Positive": "긍정", "Negative": "부정"}
 
-    # ✅ 스포츠 키워드 세트
+    # ✅ 확장된 키워드
     positive_words = [
-        "승리", "완승", "대승", "압승", "이겼다", "이기며", "역전승", "끝내기",
-        "우승", "연승", "홈런", "멀티히트", "3안타", "4안타", "쾌조", "호투",
-        "호성적", "활약", "맹활약", "쾌투", "무실점", "세이브", "QS", "피칭",
-        "3연승", "4연승", "경기 승리", "시즌 첫 승", "첫 승리", "타점", "수훈",
-        "기록 경신", "신기록", "선발 출전", "타격감", "좋은 경기력", "정상 복귀",
-        "복귀전 승리", "승부처 장악", "기세", "에이스", "주전 복귀", "첫 홈런"
+        "승리", "대승", "역전승", "홈런", "활약", "맹타", "결승타", "극적인", "끝내기", "무실점",
+        "이기며", "완봉", "4연승", "5연승", "호투", "기세", "눈부신", "연승", "역전극", "쾌조",
+        "드라마틱", "MVP", "선발승", "기록 경신", "놀라운", "완벽한", "압도적", "4타수 4안타"
+    ]
+    negative_words = [
+        "패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패",
+        "부상", "이탈", "불안", "혹사", "부진한 흐름", "기회 놓쳤다", "탈락", "결장", "퇴장"
     ]
 
-    negative_words = [
-        "패배", "역전패", "완패", "참패", "무득점", "실책", "병살타", "부상", "이탈",
-        "결장", "낙마", "부진", "부진한", "불안", "실망", "탈락", "무기력",
-        "타격 침묵", "타선 침묵", "성적 부진", "ERA 상승", "타율 하락",
-        "조기 강판", "볼넷", "난조", "난타", "실점", "기회 무산", "주루사",
-        "연패", "3연패", "4연패", "5연패", "1군 제외", "등록 말소", "방망이도 잡지 못해",
-        "엔트리 제외", "못하는", "허용", "불펜 난조", "선발 무너짐", "무승부",
-        "아쉬운", "초반에 밀렸다", "판정 논란", "징계", "출전 정지"
-    ]
+    st.subheader("📄 기사 분석 결과")
 
     for idx, article in enumerate(articles):
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
+        # 감정 분석 실행
         try:
-            label, pos_score, neg_score = sa.predict(article)
+            orig_label, pos_score, neg_score = sa.predict(article)
         except Exception as e:
-            st.error(f"감정 분석 오류 발생: {e}")
+            st.error(f"감정 분석 실패: {e}")
             continue
 
+        # 감정 보정 로직
+        has_positive = any(word in article for word in positive_words)
+        has_negative = any(word in article for word in negative_words)
+        label = orig_label  # 기본 모델 결과
         translated_label = label_map.get(label, label)
 
+        if has_negative and not has_positive:
+            label = "Negative"
+            translated_label = "부정"
+            st.caption("⚠️ 부정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
+        elif has_positive and not has_negative:
+            label = "Positive"
+            translated_label = "긍정"
+            st.caption("✅ 긍정 키워드만 있어 감정 결과가 보정되었습니다.")
+        elif has_positive and has_negative:
+            st.caption("ℹ️ 긍정/부정 키워드가 모두 있어 모델 원래 결과 유지됨.")
+
+        # 감정 출력
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.4f} / 부정: {neg_score:.4f}")
         st.progress(pos_score)
-        st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
+        st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다를 수 있습니다.")
 
-        # 보정 메시지
-        has_positive = any(word in article for word in positive_words)
-        has_negative = any(word in article for word in negative_words)
-
-        if has_negative:
-            st.caption("⚠️ 부정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정될 수 있습니다.")
-        elif label == "Negative" and has_positive:
-            st.caption("✅ 긍정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정될 수 있습니다.")
-
+        # 카운트 저장
         sentiment_counts[translated_label] += 1
 
+        # 키워드 추출
+        keywords = ke.extract(article)
+        all_keywords.update(dict(keywords))
+        st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
 
+        st.markdown("---")
 
     st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
 
-    # 폰트 설정
+    # ✅ 한글 폰트 설정
     font_path = "NanumGothic.ttf"
     font_prop = fm.FontProperties(fname=font_path)
 
+    # 📊 감정 요약 그래프
     st.subheader("📊 감정 분석 요약")
-
     labels = ["긍정", "부정"]
     values = [sentiment_counts["긍정"], sentiment_counts["부정"]]
     colors = ["#4da6ff", "#ff6666"]
@@ -105,8 +110,8 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    # 워드클라우드
-    st.subheader("☁️ 키워드 클라우드")
+    # ☁️ 워드클라우드
+    st.subheader("☁️ 키워드 워드 클라우드")
     if all_keywords:
         wc = WordCloud(
             font_path=font_path,
@@ -115,7 +120,6 @@ if uploaded_file is not None:
             height=400
         )
         wc.generate_from_frequencies(all_keywords)
-
         fig2, ax2 = plt.subplots(figsize=(10, 5))
         ax2.imshow(wc, interpolation="bilinear")
         ax2.axis("off")
