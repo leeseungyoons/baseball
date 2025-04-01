@@ -31,7 +31,7 @@ if uploaded_file is not None:
     negative_words = ["패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패"]
 
     for idx, article in enumerate(articles):
-        st.markdown(f"### 📰 여러 기사를 넣으려면 기사 사이에 빈 줄 세 칸 이상을 (Enter 3번)을 꼭 넣어주세요. #{idx+1}")
+        st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
         #감정 예측
@@ -63,7 +63,7 @@ if uploaded_file is not None:
         keywords = ke.extract(article)
         all_keywords.update(dict(keywords))
         st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
-        st.markdown("---")
+        st.markdown("여러 기사를 넣으려면 기사 사이에 빈 줄 3칸 이상을(Enter 2번)을 꼭 넣어주세요.")
 
     #✅한글 폰트 설정
     font_path = "NanumGothic.ttf"
