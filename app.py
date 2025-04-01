@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'(?:\n\s*){5,}', text.strip())
+    articles = re.split(r'(?:\n\s*){5,}', text.strip())  # 5줄 이상 빈줄 기준 분리
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
@@ -51,10 +51,7 @@ if uploaded_file is not None:
             translated_label = "긍정"
             st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
-        # 감정 분석 결과
-        pos_score = float(pos_score)
-        neg_score = float(neg_score)
-
+        # 감정 결과 출력
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.2f} / 부정: {neg_score:.2f}")
         st.progress(pos_score)
@@ -72,9 +69,10 @@ if uploaded_file is not None:
         if entities["RECORD"]:
             st.markdown(f"- 기록: {', '.join(set(entities['RECORD']))}")
 
-        # 키워드 추출
+        # 키워드 누적 저장 (선수명 + 팀명 기반)
         keywords = dict(Counter(entities["PER"] + entities["ORG"]))
         all_keywords.update(keywords)
+
         st.markdown("---")
 
     st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
