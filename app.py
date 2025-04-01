@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'(?:\n\s*){3,}', text.strip())
+    articles = re.split(r'(?:\n\s*){5,}', text.strip())
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
@@ -63,7 +63,7 @@ if uploaded_file is not None:
         keywords = ke.extract(article)
         all_keywords.update(dict(keywords))
         st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
-        st.markdown("여러 기사를 넣으려면 기사 사이에 빈 줄 3칸 이상을(Enter 2번)을 꼭 넣어주세요.")
+        st.markdown("여러 기사를 넣으려면 기사 사이에 빈 줄 5칸 이상을(Enter 5번)을 꼭 넣어주세요. /n 기사 사이에만 5번 이상이면 그 이상을 누르셔도 됩니다 :) ")
 
     #✅한글 폰트 설정
     font_path = "NanumGothic.ttf"
