@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'\n\s*\n', text.strip())  # 기사 구분
+    articles = re.split(r'\n\s*\n', text.strip())
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
@@ -26,7 +26,6 @@ if uploaded_file is not None:
     st.subheader("📄 기사 분석 결과")
     label_map = {"Positive": "긍정", "Negative": "부정"}
 
-    # 보정용 키워드
     positive_words = ["승리", "대승", "완승", "홈런", "안타", "우승", "역전", "세이브", "멀티히트", "3안타", "2안타", "3연승"]
     negative_words = ["패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패"]
 
@@ -34,17 +33,19 @@ if uploaded_file is not None:
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
-        label, prob = sa.predict(article)
+        # 원본 감정 분석 결과
+        orig_label, prob = sa.predict(article)
+        label = orig_label
         translated_label = label_map.get(label, label)
 
-        # ✅ 1. 부정 보정 우선
-        if label == "Positive" and any(word in article for word in negative_words):
+        # 🔥 부정 보정 우선
+        if orig_label == "Positive" and any(word in article for word in negative_words):
             label = "Negative"
             translated_label = "부정"
             st.caption("⚠️ 부정적인 스포츠 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
-        # ✅ 2. 긍정 보정은 그다음
-        elif label == "Negative" and any(word in article for word in positive_words):
+        # ✅ 그 다음 긍정 보정
+        elif orig_label == "Negative" and any(word in article for word in positive_words):
             label = "Positive"
             translated_label = "긍정"
             st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
@@ -86,7 +87,7 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    # ☁️ 워드클라우드
+    # ☁️ 키워드 워드클라우드
     st.subheader("☁️ 키워드 워드 클라우드")
 
     if all_keywords:
