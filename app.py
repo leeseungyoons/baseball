@@ -75,16 +75,13 @@ if uploaded_file is not None:
 
         sentiment_counts[translated_label] += 1
 
-        # 개체명 인식
+        # 개체명 인식 (없을 경우도 '없음'으로 표시)
         try:
             entities = ke.extract(article)
             st.write("📎 **개체명 추출 결과:**")
-            if entities["PER"]:
-                st.markdown(f"- 선수: {', '.join(set(entities['PER']))}")
-            if entities["ORG"]:
-                st.markdown(f"- 팀: {', '.join(set(entities['ORG']))}")
-            if entities["RECORD"]:
-                st.markdown(f"- 기록: {', '.join(set(entities['RECORD']))}")
+            st.markdown(f"- 선수: {', '.join(set(entities['PER'])) if entities['PER'] else '없음'}")
+            st.markdown(f"- 팀: {', '.join(set(entities['ORG'])) if entities['ORG'] else '없음'}")
+            st.markdown(f"- 기록: {', '.join(set(entities['RECORD'])) if entities['RECORD'] else '없음'}")
 
             # 키워드 누적 저장 (선수명 + 팀명 기반)
             keywords = dict(Counter(entities["PER"] + entities["ORG"]))
