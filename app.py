@@ -52,6 +52,9 @@ if uploaded_file is not None:
             st.caption("✅ 스포츠 긍정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
 
         # 감정 분석 결과
+        pos_score = float(pos_score)
+        neg_score = float(neg_score)
+
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.2f} / 부정: {neg_score:.2f}")
         st.progress(pos_score)
