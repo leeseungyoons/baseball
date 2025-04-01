@@ -58,13 +58,18 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    # ☁️ WordCloud
-    st.subheader("☁️ Keyword WordCloud")
+# ☁️ Keyword WordCloud
+st.subheader("☁️ Keyword WordCloud")
 
-    wc = WordCloud(font_path=None, background_color="white", width=800, height=400)
-    wc.generate_from_frequencies(all_keywords)
+wc = WordCloud(
+    font_path="NanumGothic.ttf",  # 🔥 이 줄이 핵심
+    background_color="white",
+    width=800,
+    height=400
+)
+wc.generate_from_frequencies(all_keywords)
 
-    fig2, ax2 = plt.subplots(figsize=(10, 5))
-    ax2.imshow(wc, interpolation="bilinear")
-    ax2.axis("off")
-    st.pyplot(fig2)
+fig2, ax2 = plt.subplots(figsize=(10, 5))
+ax2.imshow(wc, interpolation="bilinear")
+ax2.axis("off")
+st.pyplot(fig2)
