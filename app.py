@@ -74,15 +74,7 @@ if uploaded_file is not None:
 
         sentiment_counts[translated_label] += 1
 
-        # 키워드 추출 (단어 기반)
-        try:
-            keywords = ke.extract(article)
-            all_keywords.update(dict(keywords))
-            st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
-        except Exception as e:
-            st.error(f"키워드 추출 오류 발생: {e}")
 
-        st.markdown("---")
 
     st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
 
@@ -114,7 +106,7 @@ if uploaded_file is not None:
     st.pyplot(fig)
 
     # 워드클라우드
-    st.subheader("☁️ 키워드 워드 클라우드")
+    st.subheader("☁️ 키워드 클라우드")
     if all_keywords:
         wc = WordCloud(
             font_path=font_path,
