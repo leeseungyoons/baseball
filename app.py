@@ -18,7 +18,7 @@ uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣�
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'\n\s*\n', text.strip())
+    articles = re.split(r'(?:\n\s*){3,}', text.strip())
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
