@@ -1,5 +1,7 @@
 # # ⚾ 스포츠 기사 감정 분석 시스템
 
+> https://baseball-eakcz9yj5vkkjrhbmbxjja.streamlit.app/
+
 > Streamlit 기반 웹 애플리케이션으로, **야구 뉴스 기사**를 업로드하면 `감정 분석 결과`, `긍정/부정 비율`, `워드 클라우드`, `핵심 키워드` 등을 시각화하여 보여줍니다.
 
 <br/>
