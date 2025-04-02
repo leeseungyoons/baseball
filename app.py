@@ -119,7 +119,6 @@ if uploaded_file is not None:
     st.subheader("☁️ 키워드 워드 클라우드")
 
     
-    filtered_keywords = {k: v for k, v in all_keywords.items() if isinstance(k, str) and isinstance(v, (int, float))}
     
     if all_keywords:
         wc = WordCloud(
@@ -128,10 +127,17 @@ if uploaded_file is not None:
             width=800,
             height=400
         )
-        wc.generate_from_frequencies(dict(all_keywords))
-        fig2, ax2 = plt.subplots(figsize=(10, 5))
-        ax2.imshow(wc, interpolation="bilinear")
-        ax2.axis("off")
-        st.pyplot(fig2)
+
+        freq_dict = dict((k, int(v)) for k, v in all_keywords.items() if isinstance(v, (int, float)) and v > 0)
+
+        if freq_dict:
+        
+            wc.generate_from_frequencies(dict(all_keywords))
+            fig2, ax2 = plt.subplots(figsize=(10, 5))
+            ax2.imshow(wc, interpolation="bilinear")
+            ax2.axis("off")
+            st.pyplot(fig2)
+        else:
+            st.warning("❗ 키워드가 부족해 워드클라우드를 생성할 수 없습니다.")
     else:
         st.warning("❗ 키워드가 부족해 워드클라우드를 생성할 수 없습니다.")
