@@ -78,8 +78,10 @@ if uploaded_file is not None:
         keywords = ke.extract(article)
 
         if keywords:
-            all_keywords.update(keywords)
-            st.write("**Top Keywords:**", ", ".join(keywords.keys()))
+            all_keywords.update({k: v for k, v in keywords})
+
+            st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
+
         else:
             st.write("❗ 키워드 없음")
 
