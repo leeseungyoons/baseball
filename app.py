@@ -74,10 +74,15 @@ if uploaded_file is not None:
         # 카운트 저장
         sentiment_counts[translated_label] += 1
 
-        # 키워드 추출
+        # 키워드 추출 & 누적
         keywords = ke.extract(article)
-        all_keywords.update(dict(keywords))
-        st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords.items()]))
+
+        if keywords:
+            all_keywords.update(keywords)
+            st.write("**Top Keywords:**", ", ".join(keywords.keys()))
+        else:
+            st.write("❗ 키워드 없음")
+
 
         st.markdown("---")
 
