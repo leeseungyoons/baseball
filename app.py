@@ -124,10 +124,10 @@ if uploaded_file is not None:
             width=800,
             height=400
         )
-        wc.generate_from_frequencies(all_keywords)
+        wc.generate_from_frequencies(dict(all_keywords))
         fig2, ax2 = plt.subplots(figsize=(10, 5))
         ax2.imshow(wc, interpolation="bilinear")
         ax2.axis("off")
         st.pyplot(fig2)
     else:
-        st.write("❗ 키워드가 충분하지 않아 워드클라우드를 생성할 수 없습니다.")
+        st.warning("❗ 키워드가 부족해 워드클라우드를 생성할 수 없습니다.")
