@@ -2,88 +2,105 @@ import streamlit as st
 import re
 from sentiment_model import SentimentAnalyzer
 from keyword_extractor import KeywordExtractor
-from headline_generator import HeadlineGenerator  # ✅ 추가
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import seaborn as sns
 from collections import Counter
 from wordcloud import WordCloud
 
-# 인스턴스 생성
+# 모델 인스턴스
 sa = SentimentAnalyzer()
 ke = KeywordExtractor()
-hg = HeadlineGenerator()  # ✅ 헤드라인 생성기
 
-st.title("⚾ 스포츠 기사 분석 시스템")
+st.title("⚾ 스포츠 기사 감정 분석기")
 
-uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣어주세요. (.txt)", type="txt")
+uploaded_file = st.file_uploader("📰 뉴스나 중계 텍스트 파일을 넣어주세요 (.txt)", type="txt")
 
 if uploaded_file is not None:
     text = uploaded_file.read().decode("utf-8")
-    articles = re.split(r'(?:\n\s*){5,}', text.strip())  # 빈 줄 5줄 이상 기준 분리
+    articles = re.split(r'(?:\n\s*){5,}', text.strip())  # 5줄 이상 빈줄 기준 분리
 
     sentiment_counts = Counter({"긍정": 0, "부정": 0})
     all_keywords = Counter()
-
-    st.subheader("📄 기사 분석 결과")
     label_map = {"Positive": "긍정", "Negative": "부정"}
 
-    positive_words = ["승리", "대승", "완승", "홈런", "안타", "우승", "역전", "세이브", "멀티히트", "3안타", "2안타", "3연승"]
-    negative_words = ["패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패"]
+    # ✅ 확장된 키워드
+    positive_words = [
+        "승리", "대승", "역전승", "홈런", "활약", "맹타", "결승타", "극적인", "끝내기", "무실점",
+        "이기며", "완봉", "4연승", "5연승", "호투", "기세", "눈부신", "연승", "역전극", "쾌조",
+        "드라마틱", "MVP", "선발승", "기록 경신", "놀라운", "완벽한", "압도적", "4타수 4안타"
+    ]
+    negative_words = [
+        "패배", "병살타", "실책", "놓쳤다", "무득점", "패전", "무승부", "무산", "부진", "역전패",
+        "부상", "이탈", "불안", "혹사", "부진한 흐름", "기회 놓쳤다", "탈락", "결장", "퇴장", 
+        "결장", "공백", "구조물 낙하", "낙하", "논란", "놓쳤다", "머리 부상", "무득점",
+        "무산", "무승부", "병살타", "병원", "부상", "부진", "부진한 흐름", "불안", "사고",
+        "사망", "실망", "실책", "안전 사고", "애도", "역전패", "위험", "의심", "이별",
+        "이탈", "이탈자", "중단", "충격", "취소", "패배", "패전"
+
+    ]
+
+    st.subheader("📄 기사 분석 결과")
 
     for idx, article in enumerate(articles):
         st.markdown(f"### 📰 기사 #{idx+1}")
         st.text(article)
 
+        # 감정 분석 실행
         try:
-            label, pos_score, neg_score = sa.predict(article)
+            orig_label, pos_score, neg_score = sa.predict(article)
         except Exception as e:
-            st.error(f"❗ 감정 분석 오류: {e}")
+            st.error(f"감정 분석 실패: {e}")
             continue
 
-        translated_label = label_map.get(label, label)
+        # 감정 보정 로직
         has_positive = any(word in article for word in positive_words)
         has_negative = any(word in article for word in negative_words)
+        label = orig_label  # 기본 모델 결과
+        translated_label = label_map.get(label, label)
 
-        if has_negative:
+        if has_negative and not has_positive:
             label = "Negative"
             translated_label = "부정"
-            st.caption("⚠️ 부정 키워드 포함으로 감정 결과가 보정되었습니다.")
-        elif label == "Negative" and has_positive:
+            st.caption("⚠️ 부정 키워드가 포함되어 있어 감정 결과가 보정되었습니다.")
+        elif has_positive and not has_negative:
             label = "Positive"
             translated_label = "긍정"
-            st.caption("✅ 긍정 키워드 포함으로 감정 결과가 보정되었습니다.")
+            st.caption("✅ 긍정 키워드만 있어 감정 결과가 보정되었습니다.")
+        elif has_positive and has_negative:
+            st.caption("ℹ️ 긍정/부정 키워드가 모두 있어 모델 원래 결과 유지됨.")
 
+        # 감정 출력
         st.write(f"**감정 분석 결과:** {translated_label}")
         st.write(f"긍정: {pos_score:.4f} / 부정: {neg_score:.4f}")
         st.progress(pos_score)
-        st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다르게 분류될 수 있습니다.")
+        st.caption("⚠️ 감정 분석은 일반 텍스트 기반이며, 스포츠 기사에서는 실제 맥락과 다를 수 있습니다.")
 
+        # 카운트 저장
         sentiment_counts[translated_label] += 1
 
-        # 키워드 추출 및 누적
+        # 키워드 추출 & 누적
         keywords = ke.extract(article)
-        all_keywords.update(dict(keywords))
 
-        st.write("**Top Keywords:**", ", ".join(keywords.keys()) if keywords else "없음")
+        if keywords:
+            all_keywords.update({k: v for k, v in keywords})
 
-        # ✅ 헤드라인 생성
-        try:
-            headline = hg.generate(article)
-            st.write(f"📰 **자동 생성 헤드라인:** {headline}")
-        except Exception as e:
-            st.warning(f"헤드라인 생성 실패: {e}")
+            st.write("**Top Keywords:**", ", ".join([k for k, _ in keywords]))
+
+        else:
+            st.write("❗ 키워드 없음")
+
 
         st.markdown("---")
 
     st.info("ℹ️ 여러 기사를 넣으려면 기사 사이에 **빈 줄 5칸 이상** (Enter 5번)을 넣어주세요!")
 
-    # 한글 폰트 설정
+    # ✅ 한글 폰트 설정
     font_path = "NanumGothic.ttf"
     font_prop = fm.FontProperties(fname=font_path)
 
+    # 📊 감정 요약 그래프
     st.subheader("📊 감정 분석 요약")
-
     labels = ["긍정", "부정"]
     values = [sentiment_counts["긍정"], sentiment_counts["부정"]]
     colors = ["#4da6ff", "#ff6666"]
@@ -105,9 +122,11 @@ if uploaded_file is not None:
 
     st.pyplot(fig)
 
-    # 워드클라우드
+    # ☁️ 워드클라우드
     st.subheader("☁️ 키워드 워드 클라우드")
 
+    
+    
     if all_keywords:
         wc = WordCloud(
             font_path=font_path,
@@ -115,11 +134,25 @@ if uploaded_file is not None:
             width=800,
             height=400
         )
-        wc.generate_from_frequencies(dict(all_keywords))
 
-        fig2, ax2 = plt.subplots(figsize=(10, 5))
-        ax2.imshow(wc, interpolation="bilinear")
-        ax2.axis("off")
-        st.pyplot(fig2)
+        freq_dict = dict((k, int(v)) for k, v in all_keywords.items() if isinstance(v, (int, float)) and v > 0)
+
+        if freq_dict:
+        
+            wc.generate_from_frequencies(dict(all_keywords))
+            fig2, ax2 = plt.subplots(figsize=(10, 5))
+            ax2.imshow(wc, interpolation="bilinear")
+            ax2.axis("off")
+            st.pyplot(fig2)
+        else:
+            st.warning("❗ 키워드가 부족해 워드클라우드를 생성할 수 없습니다.")
     else:
-        st.write("❗ 키워드가 충분하지 않아 워드클라우드를 생성할 수 없습니다.")
+        st.warning("❗ 키워드가 부족해 워드클라우드를 생성할 수 없습니다.")
+
+
+
+
+
+
+
+
