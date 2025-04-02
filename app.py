@@ -117,6 +117,10 @@ if uploaded_file is not None:
 
     # ☁️ 워드클라우드
     st.subheader("☁️ 키워드 워드 클라우드")
+
+    
+    filtered_keywords = {k: v for k, v in all_keywords.items() if isinstance(k, str) and isinstance(v, (int, float))}
+    
     if all_keywords:
         wc = WordCloud(
             font_path=font_path,
