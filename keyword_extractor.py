@@ -1,19 +1,16 @@
-from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+# keyword_extractor.py
+import re
+from collections import Counter
 
 class KeywordExtractor:
-    def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained("dslim/bert-base-NER")
-        self.model = AutoModelForTokenClassification.from_pretrained("dslim/bert-base-NER")
-        self.nlp_ner = pipeline("ner", model=self.model, tokenizer=self.tokenizer)
-
     def extract(self, text):
-        ner_results = self.nlp_ner(text)
-        entities = {"PER": [], "ORG": [], "RECORD": []}
-        for entity in ner_results:
-            if "PER" in entity["entity"]:
-                entities["PER"].append(entity["word"])
-            elif "ORG" in entity["entity"]:
-                entities["ORG"].append(entity["word"])
-            elif "안타" in entity["word"] or "홈런" in entity["word"]:
-                entities["RECORD"].append(entity["word"])
-        return entities
+        # 한글 2글자 이상인 단어만 추출
+        words = re.findall(r"[가-힣]{2,}", text)
+
+        # 너무 흔한 불용어 제거
+        common_words = ["기자", "입니다", "했다", "한다", "있는", "있다", "이번", "그리고", "대해"]
+        words = [w for w in words if w not in common_words]
+
+        # 빈도수 계산
+        freq = Counter(words)
+        return freq.most_common(10)  # 상위 10개만 리턴
