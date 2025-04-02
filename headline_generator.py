@@ -1,12 +1,12 @@
-# headline_generator.py
-from transformers import PreTrainedTokenizerFast, BartForConditionalGeneration
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 class HeadlineGenerator:
     def __init__(self):
-        self.tokenizer = PreTrainedTokenizerFast.from_pretrained("digit82/kobart-news")
-        self.model = BartForConditionalGeneration.from_pretrained("digit82/kobart-news")
+        self.tokenizer = AutoTokenizer.from_pretrained("lcw99/t5-korean-news-headline-generation")
+        self.model = AutoModelForSeq2SeqLM.from_pretrained("lcw99/t5-korean-news-headline-generation")
 
-    def generate(self, article_text):
-        input_ids = self.tokenizer.encode(article_text, return_tensors="pt", max_length=512, truncation=True)
-        output = self.model.generate(input_ids, max_length=30, num_beams=5, early_stopping=True)
-        return self.tokenizer.decode(output[0], skip_special_tokens=True)
+    def generate(self, text, max_length=64):
+        input_ids = self.tokenizer.encode(text, return_tensors="pt", truncation=True)
+        output = self.model.generate(input_ids, max_length=max_length, num_beams=4, early_stopping=True)
+        headline = self.tokenizer.decode(output[0], skip_special_tokens=True)
+        return headline
