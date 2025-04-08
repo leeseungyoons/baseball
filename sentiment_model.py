@@ -7,8 +7,9 @@ import torch.nn.functional as F
 class SentimentAnalyzer:
     def __init__(self):
         # KLUE-BERT 기반 이진 감정 분류 모델 로드
-        self.tokenizer = AutoTokenizer.from_pretrained("klue/bert-base")
-        self.model = AutoModelForSequenceClassification.from_pretrained("klue/bert-base", num_labels=2)
+        self.tokenizer = AutoTokenizer.from_pretrained("model")
+        self.model = AutoModelForSequenceClassification.from_pretrained("model")
+
         self.model.eval()
 
     def predict(self, text):
